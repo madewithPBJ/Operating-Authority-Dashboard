@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operating Authority Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Login Screen -->
+  <div id="login-screen" class="screen">
+    <div class="login-card">
+      <h1>Operating Authority</h1>
+      <p>Enter your password to continue</p>
+      <form id="login-form">
+        <input type="password" id="login-password" placeholder="Password" required>
+        <button type="submit">Log In</button>
+      </form>
+      <p id="login-error" class="error" hidden></p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="dashboard" class="screen" hidden>
+    <header>
+      <h1>Operating Authority</h1>
+      <nav>
+        <button class="tab active" data-tab="customers">Customers</button>
+        <button class="tab" data-tab="send">Send Message</button>
+        <button class="tab" data-tab="transcriptions">Transcriptions</button>
+      </nav>
+      <button id="logout-btn">Log Out</button>
+    </header>
+
+    <!-- Customers Tab -->
+    <section id="tab-customers" class="tab-content active">
+      <div class="section-header">
+        <h2>Customers</h2>
+        <button id="add-customer-btn" class="btn-primary">+ Add Customer</button>
+      </div>
+
+      <div id="add-customer-form" class="inline-form" hidden>
+        <input type="text" id="new-customer-name" placeholder="Name" required>
+        <input type="tel" id="new-customer-phone" placeholder="Phone (e.g. 7205551234)" required>
+        <button id="save-customer-btn" class="btn-primary">Save</button>
+        <button id="cancel-customer-btn" class="btn-secondary">Cancel</button>
+      </div>
+
+      <div id="customers-list" class="card-list">
+        <p class="loading">Loading customers...</p>
+      </div>
+    </section>
+
+    <!-- Send Message Tab -->
+    <section id="tab-send" class="tab-content" hidden>
+      <h2>Send Message</h2>
+      <div id="recipient-list" class="checkbox-list">
+        <p class="loading">Loading customers...</p>
+      </div>
+      <div class="message-compose">
+        <label>
+          <input type="checkbox" id="select-all"> Select All
+        </label>
+        <textarea id="message-text" placeholder="Type your message..." rows="4"></textarea>
+        <button id="send-btn" class="btn-primary">Send Message</button>
+      </div>
+      <div id="send-status" hidden></div>
+    </section>
+
+    <!-- Transcriptions Tab -->
+    <section id="tab-transcriptions" class="tab-content" hidden>
+      <div class="section-header">
+        <h2>Transcriptions</h2>
+        <select id="filter-customer">
+          <option value="">All Customers</option>
+        </select>
+      </div>
+      <div id="transcriptions-list" class="card-list">
+        <p class="loading">Loading transcriptions...</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Edit Customer Modal -->
+  <div id="edit-modal" class="modal" hidden>
+    <div class="modal-content">
+      <h3>Edit Customer</h3>
+      <input type="hidden" id="edit-customer-id">
+      <input type="text" id="edit-customer-name" placeholder="Name">
+      <input type="tel" id="edit-customer-phone" placeholder="Phone">
+      <div class="modal-actions">
+        <button id="edit-save-btn" class="btn-primary">Save</button>
+        <button id="edit-cancel-btn" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
