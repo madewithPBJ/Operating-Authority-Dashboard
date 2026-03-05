@@ -155,17 +155,20 @@ document.getElementById("save-customer-btn").addEventListener("click", async () 
   btn.disabled = true;
   btn.textContent = "Saving...";
 
-  await api("add-customer", {
-    method: "POST",
-    body: JSON.stringify({ name, phone }),
-  });
+  try {
+    await api("add-customer", {
+      method: "POST",
+      body: JSON.stringify({ name, phone }),
+    });
 
-  btn.disabled = false;
-  btn.textContent = "Save";
-  document.getElementById("add-customer-form").hidden = true;
-  document.getElementById("new-customer-name").value = "";
-  document.getElementById("new-customer-phone").value = "";
-  loadCustomers();
+    document.getElementById("add-customer-form").hidden = true;
+    document.getElementById("new-customer-name").value = "";
+    document.getElementById("new-customer-phone").value = "";
+    loadCustomers();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Save";
+  }
 });
 
 // Edit customer
@@ -193,15 +196,18 @@ document.getElementById("edit-save-btn").addEventListener("click", async () => {
   btn.disabled = true;
   btn.textContent = "Saving...";
 
-  await api("update-customer", {
-    method: "PUT",
-    body: JSON.stringify({ id, name, phone }),
-  });
+  try {
+    await api("update-customer", {
+      method: "PUT",
+      body: JSON.stringify({ id, name, phone }),
+    });
 
-  btn.disabled = false;
-  btn.textContent = "Save";
-  document.getElementById("edit-modal").hidden = true;
-  loadCustomers();
+    document.getElementById("edit-modal").hidden = true;
+    loadCustomers();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Save";
+  }
 });
 
 // Delete customer
@@ -256,26 +262,28 @@ document.getElementById("send-btn").addEventListener("click", async () => {
   btn.disabled = true;
   btn.textContent = "Sending...";
 
-  const data = await api("send-message", {
-    method: "POST",
-    body: JSON.stringify({ recipients, message }),
-  });
+  try {
+    const data = await api("send-message", {
+      method: "POST",
+      body: JSON.stringify({ recipients, message }),
+    });
 
-  btn.disabled = false;
-  btn.textContent = "Send Message";
-
-  if (data && data.results) {
-    const statusEl = document.getElementById("send-status");
-    statusEl.hidden = false;
-    statusEl.innerHTML = data.results
-      .map((r) => {
-        const name = customers.find((c) => c.phone === r.to)?.name || r.to;
-        if (r.success) {
-          return `<div class="result-success">${esc(name)} — Sent</div>`;
-        }
-        return `<div class="result-fail">${esc(name)} — Failed: ${esc(r.error || "Unknown error")}</div>`;
-      })
-      .join("");
+    if (data && data.results) {
+      const statusEl = document.getElementById("send-status");
+      statusEl.hidden = false;
+      statusEl.innerHTML = data.results
+        .map((r) => {
+          const name = customers.find((c) => c.phone === r.to)?.name || r.to;
+          if (r.success) {
+            return `<div class="result-success">${esc(name)} — Sent</div>`;
+          }
+          return `<div class="result-fail">${esc(name)} — Failed: ${esc(r.error || "Unknown error")}</div>`;
+        })
+        .join("");
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Send Message";
   }
 });
 
@@ -293,12 +301,10 @@ function sendToCustomer(phone) {
 
   loadRecipients();
 
-  // Pre-check the right customer
-  setTimeout(() => {
-    document.querySelectorAll(".recipient-checkbox").forEach((cb) => {
-      cb.checked = cb.value === phone;
-    });
-  }, 50);
+  // Pre-check the right customer (DOM is already built by loadRecipients)
+  document.querySelectorAll(".recipient-checkbox").forEach((cb) => {
+    cb.checked = cb.value === phone;
+  });
 }
 
 // --- Transcriptions ---

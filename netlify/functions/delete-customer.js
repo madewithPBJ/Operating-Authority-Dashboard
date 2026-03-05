@@ -29,6 +29,11 @@ exports.handler = async (event) => {
     }
   );
 
+  if (!res.ok) {
+    const error = await res.text();
+    return { statusCode: res.status, headers, body: JSON.stringify({ error }) };
+  }
+
   return {
     statusCode: 200,
     headers,

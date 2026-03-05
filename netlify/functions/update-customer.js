@@ -18,6 +18,13 @@ exports.handler = async (event) => {
 
   const { id, name, phone } = JSON.parse(event.body);
 
+  if (!name || !name.trim()) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: "Name is required" }) };
+  }
+  if (!phone || !phone.trim()) {
+    return { statusCode: 400, headers, body: JSON.stringify({ error: "Phone is required" }) };
+  }
+
   let normalizedPhone = phone.replace(/[\s\-()]/g, "");
   if (!normalizedPhone.startsWith("whatsapp:")) {
     if (!normalizedPhone.startsWith("+")) {

@@ -20,6 +20,11 @@ exports.handler = async (event) => {
   const sid = process.env.TWILIO_ACCOUNT_SID;
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   const from = process.env.TWILIO_WHATSAPP_NUMBER;
+
+  if (!sid || !authToken || !from) {
+    return { statusCode: 500, headers, body: JSON.stringify({ error: "Server misconfigured: missing Twilio credentials" }) };
+  }
+
   const credentials = Buffer.from(`${sid}:${authToken}`).toString("base64");
 
   const results = [];
@@ -39,7 +44,7 @@ exports.handler = async (event) => {
       );
 
       const data = await res.json();
-      results.push({ to, success: res.ok, sid: data.sid, error: data.message });
+      results.push({ to, success: res.ok, sid: data.sid, error: data.error_message });
     } catch (err) {
       results.push({ to, success: false, error: err.message });
     }
