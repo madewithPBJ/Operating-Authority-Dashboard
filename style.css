@@ -404,6 +404,8 @@ header nav {
 #send-status .result-fail { color: var(--danger); }
 
 /* Modal */
+[hidden] { display: none !important; }
+
 .modal {
   position: fixed;
   inset: 0;
