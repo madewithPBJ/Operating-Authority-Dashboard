@@ -72,7 +72,13 @@ async function api(path, options = {}) {
     showLogin();
     return null;
   }
-  return res.json();
+  const text = await res.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    console.error(`API ${path} returned non-JSON:`, text);
+    return null;
+  }
 }
 
 // ============================================================
@@ -105,14 +111,20 @@ async function loadCustomerOverview() {
   const list = document.getElementById("customers-list");
   list.innerHTML = '<p class="loading">Loading...</p>';
 
-  const [custData, promptData] = await Promise.all([
-    api("get-customers"),
-    api("get-prompts"),
-  ]);
+  let custData, promptData;
+  try {
+    [custData, promptData] = await Promise.all([
+      api("get-customers"),
+      api("get-prompts").catch(() => []),
+    ]);
+  } catch {
+    list.innerHTML = '<p class="empty">Failed to load customers.</p>';
+    return;
+  }
 
   if (!custData) return;
-  customers = custData;
-  allPrompts = promptData || [];
+  customers = Array.isArray(custData) ? custData : [];
+  allPrompts = Array.isArray(promptData) ? promptData : [];
 
   if (customers.length === 0) {
     list.innerHTML = '<p class="empty">No customers yet. Add your first one above.</p>';
