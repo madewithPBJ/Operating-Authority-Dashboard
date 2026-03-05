@@ -29,15 +29,14 @@
     <header>
       <h1>Operating Authority</h1>
       <nav>
-        <button class="tab active" data-tab="customers">Customers</button>
-        <button class="tab" data-tab="send">Send Message</button>
-        <button class="tab" data-tab="transcriptions">Transcriptions</button>
+        <button class="nav-btn active" data-view="customers">Customers</button>
+        <button class="nav-btn" data-view="transcriptions">Transcriptions</button>
       </nav>
       <button id="logout-btn">Log Out</button>
     </header>
 
-    <!-- Customers Tab -->
-    <section id="tab-customers" class="tab-content active">
+    <!-- View: Customer Overview -->
+    <section id="view-customers" class="view">
       <div class="section-header">
         <h2>Customers</h2>
         <button id="add-customer-btn" class="btn-primary">+ Add Customer</button>
@@ -55,24 +54,69 @@
       </div>
     </section>
 
-    <!-- Send Message Tab -->
-    <section id="tab-send" class="tab-content" hidden>
-      <h2>Send Message</h2>
-      <div id="recipient-list" class="checkbox-list">
-        <p class="loading">Loading customers...</p>
+    <!-- View: Customer Detail -->
+    <section id="view-detail" class="view" hidden>
+      <div class="breadcrumb">
+        <button id="back-to-customers" class="btn-back">&larr; Customers</button>
       </div>
-      <div class="message-compose">
-        <label>
-          <input type="checkbox" id="select-all"> Select All
-        </label>
-        <textarea id="message-text" placeholder="Type your message..." rows="4"></textarea>
-        <button id="send-btn" class="btn-primary">Send Message</button>
+
+      <div class="detail-header">
+        <div>
+          <h2 id="detail-name"></h2>
+          <p id="detail-phone" class="text-muted"></p>
+        </div>
+        <div class="detail-actions">
+          <button id="detail-edit-btn" class="btn-small">Edit</button>
+          <button id="detail-delete-btn" class="btn-danger">Delete</button>
+        </div>
       </div>
-      <div id="send-status" hidden></div>
+
+      <div class="detail-section">
+        <div class="section-header">
+          <span class="section-label">Prompts</span>
+          <button id="new-prompt-btn" class="btn-primary">Send New Prompt</button>
+        </div>
+        <div id="prompt-history">
+          <p class="loading">Loading prompts...</p>
+        </div>
+      </div>
     </section>
 
-    <!-- Transcriptions Tab -->
-    <section id="tab-transcriptions" class="tab-content" hidden>
+    <!-- View: Prompt Composer -->
+    <section id="view-composer" class="view" hidden>
+      <div class="breadcrumb">
+        <button id="back-to-detail" class="btn-back">&larr; Back</button>
+      </div>
+
+      <h2>Send New Prompt</h2>
+      <p class="text-muted" id="composer-recipient"></p>
+
+      <div class="composer-form">
+        <label class="field-label">Intro message</label>
+        <input type="text" id="composer-intro" value="Hey! Here are this week's questions:">
+
+        <label class="field-label">Paste your numbered questions</label>
+        <textarea id="composer-questions" rows="6" placeholder="1. What's your biggest challenge right now?&#10;2. How did last week go?&#10;3. What's next for you?"></textarea>
+
+        <label class="field-label">Outro message</label>
+        <input type="text" id="composer-outro" value="Just reply with a voice note for each one.">
+
+        <div id="composer-preview" hidden>
+          <label class="field-label">Preview</label>
+          <div id="preview-content" class="preview-box"></div>
+        </div>
+
+        <div id="composer-status" hidden></div>
+
+        <div class="composer-actions">
+          <button id="composer-preview-btn" class="btn-secondary">Preview</button>
+          <button id="composer-send-btn" class="btn-primary">Send Prompt</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- View: Raw Transcriptions -->
+    <section id="view-transcriptions" class="view" hidden>
       <div class="section-header">
         <h2>Transcriptions</h2>
         <select id="filter-customer">
@@ -95,6 +139,20 @@
       <div class="modal-actions">
         <button id="edit-save-btn" class="btn-primary">Save</button>
         <button id="edit-cancel-btn" class="btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reassign Response Modal -->
+  <div id="reassign-modal" class="modal" hidden>
+    <div class="modal-content">
+      <h3>Reassign Response</h3>
+      <input type="hidden" id="reassign-transcription-id">
+      <label class="field-label">Move to question</label>
+      <select id="reassign-question-select"></select>
+      <div class="modal-actions">
+        <button id="reassign-save-btn" class="btn-primary">Save</button>
+        <button id="reassign-cancel-btn" class="btn-secondary">Cancel</button>
       </div>
     </div>
   </div>
