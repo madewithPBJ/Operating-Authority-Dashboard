@@ -431,6 +431,12 @@ header nav { display: flex; gap: 4px; flex: 1; }
   color: var(--text-muted);
 }
 
+.char-count {
+  font-size: 13px;
+  color: var(--text-faint);
+  margin-top: 4px;
+}
+
 .result-success { color: var(--success); }
 .result-fail { color: var(--danger); }
 

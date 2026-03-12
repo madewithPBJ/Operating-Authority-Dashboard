@@ -97,6 +97,7 @@ function showView(viewName) {
 
   if (viewName === "customers") loadCustomerOverview();
   if (viewName === "transcriptions") loadTranscriptions();
+  if (viewName === "drafts") loadDrafts();
 }
 
 document.querySelectorAll(".nav-btn").forEach((btn) => {
@@ -497,6 +498,129 @@ document.getElementById("reassign-save-btn").addEventListener("click", async () 
   } finally {
     btn.disabled = false;
     btn.textContent = "Save";
+  }
+});
+
+// ============================================================
+// DRAFTS
+// ============================================================
+
+async function loadDrafts() {
+  const list = document.getElementById("drafts-list");
+  list.innerHTML = '<p class="loading">Loading drafts...</p>';
+
+  const data = await api("get-drafts");
+  if (!data) return;
+
+  if (!Array.isArray(data) || data.length === 0) {
+    list.innerHTML = '<p class="empty">No drafts yet. Send your first one above.</p>';
+    return;
+  }
+
+  list.innerHTML = data
+    .map((d) => {
+      const name = customers.find((c) => c.phone === d.customer_phone)?.name || d.customer_phone;
+      const date = new Date(d.sent_at).toLocaleDateString();
+      const preview = d.draft_text.length > 120 ? d.draft_text.substring(0, 120) + "..." : d.draft_text;
+
+      let statusBadge;
+      if (d.status === "approved") {
+        statusBadge = '<span class="badge badge-green">Approved</span>';
+      } else if (d.status === "changes_requested") {
+        statusBadge = '<span class="badge badge-gold">Changes Requested</span>';
+      } else {
+        statusBadge = '<span class="badge badge-gray">Pending</span>';
+      }
+
+      const responded = d.responded_at
+        ? `<span class="text-faint">${new Date(d.responded_at).toLocaleString()}</span>`
+        : "";
+
+      return `
+        <div class="card">
+          <div class="card-info">
+            <div class="name">${esc(name)}</div>
+            <div class="phone">${esc(preview)}</div>
+          </div>
+          <div class="card-status">
+            ${statusBadge}
+            <span class="text-faint">${date}</span>
+            ${responded}
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+// New draft button
+document.getElementById("new-draft-btn").addEventListener("click", () => {
+  document.querySelectorAll(".view").forEach((v) => (v.hidden = true));
+  document.getElementById("view-draft-composer").hidden = false;
+  document.querySelectorAll(".nav-btn").forEach((b) => b.classList.remove("active"));
+
+  // Populate customer dropdown
+  const select = document.getElementById("draft-customer-select");
+  select.innerHTML = '<option value="">Select a customer</option>';
+  customers.forEach((c) => {
+    const opt = document.createElement("option");
+    opt.value = c.phone;
+    opt.dataset.name = c.name;
+    opt.textContent = `${c.name} (${c.phone.replace("whatsapp:", "")})`;
+    select.appendChild(opt);
+  });
+
+  document.getElementById("draft-text").value = "";
+  document.getElementById("draft-char-count").textContent = "0 characters";
+  document.getElementById("draft-status").hidden = true;
+});
+
+document.getElementById("back-to-drafts").addEventListener("click", () => showView("drafts"));
+
+// Character counter
+document.getElementById("draft-text").addEventListener("input", (e) => {
+  const len = e.target.value.length;
+  const counter = document.getElementById("draft-char-count");
+  counter.textContent = `${len} character${len !== 1 ? "s" : ""}`;
+  counter.style.color = len > 900 ? "#c8a868" : "";
+});
+
+// Send draft
+document.getElementById("draft-send-btn").addEventListener("click", async () => {
+  const select = document.getElementById("draft-customer-select");
+  const phone = select.value;
+  const name = select.selectedOptions[0]?.dataset.name || "";
+  const text = document.getElementById("draft-text").value.trim();
+
+  if (!phone) return alert("Select a customer.");
+  if (!text) return alert("Paste the draft text.");
+
+  const btn = document.getElementById("draft-send-btn");
+  btn.disabled = true;
+  btn.textContent = "Sending...";
+
+  try {
+    const data = await api("send-draft", {
+      method: "POST",
+      body: JSON.stringify({
+        customer_phone: phone,
+        customer_name: name,
+        draft_text: text,
+      }),
+    });
+
+    const statusEl = document.getElementById("draft-status");
+    statusEl.hidden = false;
+
+    if (data && data.success) {
+      statusEl.innerHTML = '<div class="result-success">Draft sent for approval!</div>';
+      setTimeout(() => showView("drafts"), 1500);
+    } else {
+      statusEl.innerHTML = `<div class="result-fail">Failed: ${esc((data && data.error) || "Unknown error")}</div>`;
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Send for Approval";
   }
 });
 

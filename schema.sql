@@ -53,3 +53,22 @@ DO $$ BEGIN
   CREATE POLICY "Allow all" ON prompts FOR ALL USING (true) WITH CHECK (true);
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
+
+-- === V3: DRAFT APPROVAL VIA WHATSAPP TEMPLATES ===
+
+CREATE TABLE drafts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  customer_phone TEXT NOT NULL,
+  draft_text TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending', 'approved', 'changes_requested')),
+  sent_at TIMESTAMPTZ DEFAULT now(),
+  responded_at TIMESTAMPTZ
+);
+
+ALTER TABLE drafts ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  CREATE POLICY "Allow all" ON drafts FOR ALL USING (true) WITH CHECK (true);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;

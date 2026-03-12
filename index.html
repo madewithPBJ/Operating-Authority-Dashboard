@@ -31,6 +31,7 @@
       <nav>
         <button class="nav-btn active" data-view="customers">Customers</button>
         <button class="nav-btn" data-view="transcriptions">Transcriptions</button>
+        <button class="nav-btn" data-view="drafts">Drafts</button>
       </nav>
       <button id="logout-btn">Log Out</button>
     </header>
@@ -111,6 +112,41 @@
         <div class="composer-actions">
           <button id="composer-preview-btn" class="btn-secondary">Preview</button>
           <button id="composer-send-btn" class="btn-primary">Send Prompt</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- View: Drafts -->
+    <section id="view-drafts" class="view" hidden>
+      <div class="section-header">
+        <h2>Drafts</h2>
+        <button id="new-draft-btn" class="btn-primary">+ New Draft</button>
+      </div>
+      <div id="drafts-list" class="card-list">
+        <p class="loading">Loading drafts...</p>
+      </div>
+    </section>
+
+    <!-- View: Draft Composer -->
+    <section id="view-draft-composer" class="view" hidden>
+      <div class="breadcrumb">
+        <button id="back-to-drafts" class="btn-back">&larr; Drafts</button>
+      </div>
+
+      <h2>Send Draft for Approval</h2>
+
+      <div class="composer-form">
+        <label class="field-label">Customer</label>
+        <select id="draft-customer-select"></select>
+
+        <label class="field-label">Post draft</label>
+        <textarea id="draft-text" rows="12" placeholder="Paste the LinkedIn post or blog draft here..."></textarea>
+        <div id="draft-char-count" class="char-count">0 characters</div>
+
+        <div id="draft-status" hidden></div>
+
+        <div class="composer-actions">
+          <button id="draft-send-btn" class="btn-primary">Send for Approval</button>
         </div>
       </div>
     </section>
